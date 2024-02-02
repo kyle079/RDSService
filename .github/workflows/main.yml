@@ -60,7 +60,7 @@ jobs:
         $version = $version.Trim() # Trimming to ensure clean output
         $version = $version -replace 'Version: ', '' # Extracting just the version number
         echo "version=$version" >> $Env:GITHUB_OUTPUT
-      working-directory: ./RDSService/RDSService
+      working-directory: ./RDSService
 
     - name: Create service Release
       id: create_release
