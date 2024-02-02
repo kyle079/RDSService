@@ -20,7 +20,7 @@ namespace RDSService.Services
             return output.FirstOrDefault()!.Properties["ActiveManagementServer"].Value.ToString()!;
         }
 
-        public async Task<List<RdsSession>> GetSessions(string? connectionBroker = null)
+        public async Task<List<RdsSession>?> GetSessions(string? connectionBroker = null)
         {
             connectionBroker = GetConnectionBroker(connectionBroker);
             var output = await ExecutePowerShellCommand("Get-RDUserSession",

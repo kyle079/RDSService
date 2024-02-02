@@ -18,7 +18,7 @@ namespace RDSServiceLibrary.Interfaces
         /// Gets the sessions from the specified active management server.
         /// </summary>
         /// <returns>A Task representing the asynchronous operation, with an <see cref="PSObject"/> as the result representing the sessions.</returns>
-        Task<List<RdsSession>> GetSessions(string? connectionBroker = null);
+        Task<List<RdsSession>?> GetSessions(string? connectionBroker = null);
 
         /// <summary>
         /// Disconnects a session from the specified host server and active management server.

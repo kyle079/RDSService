@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using RDSService.Services;
+using RDSServiceLibrary.Models;
 using Xunit.Abstractions;
 
 namespace RDSServiceTester;
