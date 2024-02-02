@@ -1,10 +1,6 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
-using RDSService;
-using RDSService.Interfaces;
 using RDSService.Services;
+using RDSServiceLibrary.Interfaces;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +16,11 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    Log.Information("Application is starting up...");
+    Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+
     // Add services to the container.
+    Log.Information("Adding services to the container...");
     builder.Services.AddControllers();
     builder.Services.AddScoped<IRdsSessionService, RdsSessionService>();
     builder.Services.AddEndpointsApiExplorer();
@@ -39,16 +39,21 @@ try
             }
         });
     });
-    
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("MyCorsPolicy",
-            builder => { builder.WithOrigins("http://localhost:8080").AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
+            builder =>
+            {
+                builder.WithOrigins("http://localhost:8080").AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            });
     });
-    
+
+    Log.Information("Building application...");
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
+    Log.Information("Configuring HTTP request pipeline...");
     if (app.Environment.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
@@ -58,7 +63,8 @@ try
         app.UseExceptionHandler("/Error");
         app.UseHsts();
     }
-    
+
+    Log.Information("Adding middleware...");
     app.UseCors("MyCorsPolicy");
     app.UseAuthorization();
     app.UseAuthentication();
@@ -70,8 +76,10 @@ try
     app.UseSwagger();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "RDS Service V1"); });
 
+    Log.Information("Adding endpoints...");
     app.MapControllers();
 
+    Log.Information("Application started successfully");
     app.Run();
 }
 catch (Exception e)

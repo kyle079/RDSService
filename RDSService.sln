@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RDSService", "RDSService\RD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RDSServiceTester", "RDSServiceTester\RDSServiceTester.csproj", "{6A36226D-9310-48C0-AD67-FBBA810CA6AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RDSServiceClient", "RDSServiceClient\RDSServiceClient.csproj", "{01F470E2-A2C5-48DD-97E5-87EB885DBF9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RDSServiceLibrary", "RDSServiceLibrary\RDSServiceLibrary.csproj", "{AA607846-DCC3-4FC3-84A3-C98EA6F06BD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{6A36226D-9310-48C0-AD67-FBBA810CA6AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A36226D-9310-48C0-AD67-FBBA810CA6AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A36226D-9310-48C0-AD67-FBBA810CA6AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01F470E2-A2C5-48DD-97E5-87EB885DBF9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01F470E2-A2C5-48DD-97E5-87EB885DBF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01F470E2-A2C5-48DD-97E5-87EB885DBF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01F470E2-A2C5-48DD-97E5-87EB885DBF9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA607846-DCC3-4FC3-84A3-C98EA6F06BD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA607846-DCC3-4FC3-84A3-C98EA6F06BD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA607846-DCC3-4FC3-84A3-C98EA6F06BD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA607846-DCC3-4FC3-84A3-C98EA6F06BD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

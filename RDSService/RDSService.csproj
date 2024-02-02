@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Helpers\" />
+      <ProjectReference Include="..\RDSServiceLibrary\RDSServiceLibrary.csproj" />
     </ItemGroup>
 
 </Project>

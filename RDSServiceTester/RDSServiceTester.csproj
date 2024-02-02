@@ -8,12 +8,14 @@
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <LangVersion>default</LangVersion>
+        <UserSecretsId>2497959e-3a50-41db-bcbd-b47b3c8cd0d7</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0"/>
         <PackageReference Include="Moq" Version="4.20.70" />
         <PackageReference Include="xunit" Version="2.6.6" />
+        <PackageReference Include="Xunit.DependencyInjection" Version="8.9.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

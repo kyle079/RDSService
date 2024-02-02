@@ -1,6 +1,6 @@
 ﻿using System.Management.Automation;
 
-namespace RDSService.Models;
+namespace RDSServiceLibrary.Models;
 
 public class RdsSession
 {

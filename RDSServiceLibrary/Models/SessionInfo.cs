@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace RDSService.Models;
+namespace RDSServiceLibrary.Models;
 
 public class SessionInfo
 {

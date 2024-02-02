@@ -18,3 +18,9 @@ It is designed to run on IIS (Internet Information Services) and is written in C
 5. Copy the published files to the desired location on the server
 6. Create a new IIS site and point it to the published folder
 7. Configure the site to use a specific port and SSL certificate
+
+## Requirements
+
+- Microsoft .NET 7 Windows Hosting Bundle
+- IIS (Internet Information Services)
+- Port opened on the firewall matching the site port

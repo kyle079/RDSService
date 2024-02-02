@@ -1,114 +1,102 @@
-﻿using System.Collections.ObjectModel;
-using System.Management.Automation;
-using RDSService.Interfaces;
-using RDSService.Models;
+﻿using System.Management.Automation;
+using RDSServiceLibrary;
+using RDSServiceLibrary.Helpers;
+using RDSServiceLibrary.Interfaces;
+using RDSServiceLibrary.Models;
 using Serilog;
 
-namespace RDSService.Services;
-
-public class RdsSessionService : IRdsSessionService
+namespace RDSService.Services
 {
-    public async Task<string> GetActiveManagementServer()
+    public class RdsSessionService : IRdsSessionService
     {
-        try
+        private static string GetConnectionBroker(string? connectionBroker) =>
+            connectionBroker ?? DnsHelper.GetFqdn();
+
+        public async Task<string> GetActiveManagementServer(string? connectionBroker = null)
         {
-            var ps = PowerShell.Create()
-                .AddCommand("Get-RDConnectionBrokerHighAvailability")
-                .AddParameter("ConnectionBroker", "rdscb01.royal.corp");
-            var output = await ps.InvokeAsync();
-            if (ps.HadErrors)
+            connectionBroker = GetConnectionBroker(connectionBroker);
+            var output = await ExecutePowerShellCommand("Get-RDConnectionBrokerHighAvailability",
+                new { ConnectionBroker = connectionBroker });
+            return output.FirstOrDefault()!.Properties["ActiveManagementServer"].Value.ToString()!;
+        }
+
+        public async Task<List<RdsSession>> GetSessions(string? connectionBroker = null)
+        {
+            connectionBroker = GetConnectionBroker(connectionBroker);
+            var output = await ExecutePowerShellCommand("Get-RDUserSession",
+                new { ConnectionBroker = await GetActiveManagementServer(connectionBroker) });
+            return output.Select(psObject => new RdsSession(psObject)).ToList();
+        }
+
+        public async Task<bool> DisconnectSession(SessionInfo sessionInfo, string? connectionBroker = null)
+        {
+            connectionBroker = GetConnectionBroker(connectionBroker);
+            await ExecutePowerShellCommand("Disconnect-RDUser",
+                new
+                {
+                    sessionInfo.HostServer, sessionInfo.UnifiedSessionId, Force = true,
+                    ConnectionBroker = await GetActiveManagementServer(connectionBroker)
+                });
+            return true;
+        }
+
+        public async Task<bool> LogOffSession(SessionInfo sessionInfo, string? connectionBroker = null)
+        {
+            connectionBroker = GetConnectionBroker(connectionBroker);
+            await ExecutePowerShellCommand("Invoke-RDUserLogoff",
+                new
+                {
+                    sessionInfo.HostServer, sessionInfo.UnifiedSessionId, Force = true,
+                    ConnectionBroker = await GetActiveManagementServer(connectionBroker)
+                });
+            return true;
+        }
+
+        private async Task<PSDataCollection<PSObject>> ExecutePowerShellCommand(string command, object parameters)
+        {
+            Log.Information("Executing {Command} with {Parameters}", command, parameters);
+            var ps = PowerShell.Create();
+            await AddRemoteDesktopModule(ps);
+            ps.AddCommand(command);
+            foreach (var prop in parameters.GetType().GetProperties())
             {
-                var errors = ps.Streams.Error.ReadAll() ?? new Collection<ErrorRecord>();
-                Log.Error("Error getting active management server: {Errors}", errors);
-                throw new Exception(
-                    $"Error getting active management server {errors.Count} found in Powershell script");
+                ps.AddParameter(prop.Name, prop.GetValue(parameters));
+            }
+            var output = await ps.InvokeAsync();
+            if (!ps.HadErrors)
+            {
+                if (output.Count != 0)
+                    Log.Information("Successfully Executed {Command} with {Parameters} and returned {OutputCount} results", command,
+                        parameters, output.Count);
+                else
+                    Log.Information("Successfully Executed {Command} with {Parameters} and returned no results", command,
+                        parameters);
+                return output;
             }
 
-            if (output.Count == 0 || output.FirstOrDefault()?.ToString() == "")
-            {
-                throw new Exception("No active management server found");
-            }
-
-            return output.FirstOrDefault()?.Properties["ActiveManagementServer"].Value.ToString() ??
-                   throw new Exception("No active management server found");
+            var errors = ps.Streams.Error.ReadAll();
+            Log.Error("Error executing {Command}: {Errors}", command, errors);
+            throw new RdsServiceException("Error executing PowerShell command.", errors, command, parameters);
         }
-        catch (Exception e)
-        {
-            Log.Error(e, "Error getting active management server");
-            throw;
-        }
-    }
 
-    public async Task<List<RdsSession>> GetSessions()
-    {
-        try
+        private static async Task AddRemoteDesktopModule(PowerShell ps)
         {
-            var ps = PowerShell.Create()
-                .AddCommand("Get-RDUserSession")
-                .AddParameter("ConnectionBroker", await GetActiveManagementServer());
-            var output = await ps.InvokeAsync();
+            ps.AddCommand("Set-ExecutionPolicy").AddParameter("ExecutionPolicy", "RemoteSigned")
+                .AddParameter("Scope", "Process").AddParameter("Force");
+            await ps.InvokeAsync();
+            ps.Commands.Clear();
+
+            ps.AddCommand("Import-Module").AddParameter("Name", "RemoteDesktop").AddParameter("Verbose");
+            await ps.InvokeAsync();
             if (ps.HadErrors)
             {
                 var errors = ps.Streams.Error.ReadAll();
-                Log.Error("Error getting RDS sessions: {Errors}", errors);
-                throw new Exception("Error getting RDS sessions. Powershell script had errors.");
+                Log.Error("Error importing RemoteDesktop module: {Errors}", errors);
+                throw new RdsServiceException("Error importing RemoteDesktop module", errors, "Import-Module",
+                    "RemoteDesktop");
             }
-            if (output.Count == 0)
-            {
-                throw new Exception("No RDS sessions found");
-            }
-            var rdsSessions = output.Select(psObject => new RdsSession(psObject)).ToList();
-            return rdsSessions;
-        }
-        catch (Exception e)
-        {
-            Log.Error(e, "Error getting RDS sessions");
-            throw;
-        }
-    }
 
-    public async Task<bool> DisconnectSession(SessionInfo sessionInfo)
-    {
-        try
-        {
-            var ps = PowerShell.Create()
-                .AddCommand("Disconnect-RDUser")
-                .AddParameter("HostServer", sessionInfo.HostServer)
-                .AddParameter("UnifiedSessionID", sessionInfo.UnifiedSessionId)
-                .AddParameter("Force");
-            await ps.InvokeAsync();
-            if (!ps.HadErrors) return true;
-            var errors = ps.Streams.Error.ReadAll();
-            Log.Error("Error disconnecting RDS session: {Errors}", errors);
-            throw new Exception("Error disconnecting RDS session");
-        }
-        catch (Exception e)
-        {
-            Log.Error(e, "Error disconnecting RDS session");
-            throw;
-        }
-    }
-
-    public async Task<bool> LogOffSession(SessionInfo sessionInfo)
-    {
-        try
-        {
-            var ps = PowerShell.Create()
-                .AddCommand("Import-Module RemoteDesktop")
-                .AddCommand("Invoke-RDUserLogoff")
-                .AddParameter("HostServer", sessionInfo.HostServer)
-                .AddParameter("UnifiedSessionID", sessionInfo.UnifiedSessionId)
-                .AddParameter("Force");
-            await ps.InvokeAsync();
-            if (!ps.HadErrors) return true;
-            var errors = ps.Streams.Error.ReadAll();
-            Log.Error("Error logging off RDS session: {Errors}", errors);
-            throw new Exception("Error logging off RDS session");
-        }
-        catch (Exception e)
-        {
-            Log.Error(e, "Error logging off RDS session");
-            throw;
+            ps.Commands.Clear();
         }
     }
 }

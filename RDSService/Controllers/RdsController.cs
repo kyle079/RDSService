@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RDSService.Interfaces;
-using RDSService.Models;
+using RDSServiceLibrary.Interfaces;
+using RDSServiceLibrary.Models;
 using Serilog;
 
 namespace RDSService.Controllers
