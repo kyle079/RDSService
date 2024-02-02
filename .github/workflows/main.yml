@@ -56,11 +56,12 @@ jobs:
       id: get_version
       shell: pwsh
       run: |
-        $version = dotnet msbuild ./RDSService/RDSService.csproj -target:PrintVersion -property:Version
-        echo "##[set-output name=version;]$version"
-      working-directory: ./RDSService
+        $version = dotnet msbuild -target:PrintVersion | Out-String
+        $version = $version.Trim() # Trimming to ensure clean output
+        $version = $version -replace 'Version: ', '' # Extracting just the version number
+        echo "version=$version" >> $Env:GITHUB_OUTPUT
+      working-directory: ./RDSService/RDSService
 
-        
     - name: Create service Release
       id: create_release
       uses: actions/create-release@v1
