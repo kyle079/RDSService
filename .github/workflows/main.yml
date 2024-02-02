@@ -20,59 +20,48 @@ jobs:
       with:
         dotnet-version: '7.0'
         
-    - name: Restore dependencies
+    - name: Restore client dependencies
       run: dotnet restore
       working-directory: ./RDSServiceClient
 
-    - name: Build
+    - name: Build client
       run: dotnet build --configuration Release --no-restore
       working-directory: ./RDSServiceClient    
 
-    - name: Pack
+    - name: Pack client
       run: dotnet pack --configuration Release --no-build --output ../nupkgs
       working-directory: ./RDSServiceClient
       
-    - name: Push to GitHub Packages
+    - name: Push client to GitHub Packages
       run: dotnet nuget push "*.nupkg" --source "https://nuget.pkg.github.com/kyle079/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
       working-directory: ./nupkgs 
     
-    - name: Restore dependencies
+    - name: Restore service dependencies
       run: dotnet restore
       working-directory: ./RDSService
 
-    - name: Build
+    - name: Build service
       run: dotnet build --configuration Release --no-restore
       working-directory: ./RDSService    
 
-    - name: Pack
+    - name: Pack service
       run: dotnet publish --configuration Release --no-build --output ../release
       working-directory: ./RDSService
 
-    - name: Zip
+    - name: Zip service
       run: Compress-Archive -Path ./release/* -DestinationPath ./RDSService.zip
+      working-directory: ./
 
-    - name: Extract Version
+    - name: Extract service Version
       id: get_version
       shell: pwsh
       run: |
-        $csprojPath = './RDSService/RDSService.csproj' # Adjust the path to your project file
-        $csproj = [xml](Get-Content $csprojPath)
-        $version = $csproj.Project.PropertyGroup.Version
-        echo "::set-output name=version::$version"
-      
-    - name: Check if Release Exists
-      id: check_release
-      uses: octokit/request-action@v2.x
-      with:
-        route: GET /repos/:repository/releases/tags/:tag
-        tag: ${{ steps.get_version.outputs.version }}
-        repository: ${{ github.repository }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true
+        $version = dotnet msbuild ./RDSService/RDSService.csproj -target:PrintVersion -property:Version
+        echo "##[set-output name=version;]$version"
+      working-directory: ./RDSService
 
-    - name: Create Release if Not Exists
-      if: steps.check_release.outputs.data == null
+        
+    - name: Create service Release
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -83,22 +72,13 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Get Release Upload URL
-      id: get_upload_url
-      run: |
-        if [ "${{ steps.check_release.outputs.data }}" == "" ]; then
-          echo "::set-output name=upload_url::${{ steps.create_release.outputs.upload_url }}"
-        else
-          echo "::set-output name=upload_url::$(echo '${{ steps.check_release.outputs.data }}' | jq -r .upload_url)"
-        fi
-      shell: bash
-
-    - name: Upload Release Asset
+    - name: Upload service Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./RDSService.zip
         asset_name: RDSService.zip
         asset_content_type: application/zip
+
