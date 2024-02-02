@@ -33,4 +33,8 @@
       <ProjectReference Include="..\RDSServiceLibrary\RDSServiceLibrary.csproj" />
     </ItemGroup>
 
+    <Target Name="PrintVersion">
+        <Message Text="Version: $(Version)" Importance="high"/>
+    </Target>
+
 </Project>
