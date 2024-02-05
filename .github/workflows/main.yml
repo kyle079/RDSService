@@ -38,6 +38,7 @@ jobs:
 
     - name: Push client to NugGet Gallery
       run: dotnet nuget push "*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+      working-directory: ./nupkgs
     
     - name: Restore service dependencies
       run: dotnet restore
