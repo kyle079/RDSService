@@ -36,15 +36,22 @@ jobs:
       run: dotnet nuget push "*.nupkg" --source "https://nuget.pkg.github.com/kyle079/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
       working-directory: ./nupkgs/RDSServiceClient
 
+    - name: Restore library dependencies
+      run: dotnet restore
+      working-directory: ./RDSServiceLibrary
+
+    - name: Build library
+      run: dotnet build --configuration Release
+      working-directory: ./RDSServiceLibrary
+
     - name: Pack library
       run: dotnet pack --configuration Release --no-build --output ../nupkgs/RDSServiceLibrary -IncludeReferencedProjects
       working-directory: ./RDSServiceLibrary
       
-    - name: Push client to GitHub Packages
+    - name: Push library to GitHub Packages
       run: dotnet nuget push "*.nupkg" --source "https://nuget.pkg.github.com/kyle079/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
       working-directory: ./nupkgs/RDSServiceLibrary
       
-    
     - name: Restore service dependencies
       run: dotnet restore
       working-directory: ./RDSService
