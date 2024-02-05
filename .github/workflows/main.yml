@@ -34,7 +34,10 @@ jobs:
       
     - name: Push client to GitHub Packages
       run: dotnet nuget push "*.nupkg" --source "https://nuget.pkg.github.com/kyle079/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
-      working-directory: ./nupkgs 
+      working-directory: ./nupkgs
+
+    - name: Push client to NugGet Gallery
+      run: dotnet nuget push "*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
     
     - name: Restore service dependencies
       run: dotnet restore
