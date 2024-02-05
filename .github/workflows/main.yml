@@ -29,7 +29,7 @@ jobs:
       working-directory: ./RDSServiceClient    
 
     - name: Pack client
-      run: dotnet pack --configuration Release --no-build --output ../nupkgs
+      run: dotnet pack --configuration Release --no-build --output ../nupkgs -IncludeReferencedProjects
       working-directory: ./RDSServiceClient
       
     - name: Push client to GitHub Packages
