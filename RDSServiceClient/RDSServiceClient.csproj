@@ -5,6 +5,13 @@
         <Nullable>enable</Nullable>
         <LangVersion>default</LangVersion>
         <TargetFramework>net7.0</TargetFramework>
+        <Title>RDSServiceClient</Title>
+        <Description>Client for RDSService running on a remote RDS connection broker</Description>
+        <PackageProjectUrl>https://github.com/kyle079/RDSService</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/kyle079/RDSService</RepositoryUrl>
+        <Version>1.0.2</Version>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
