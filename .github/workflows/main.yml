@@ -72,11 +72,13 @@ jobs:
       id: get_version
       shell: pwsh
       run: |
-        $version = dotnet msbuild -target:PrintVersion | Out-String
-        $version = $version.Trim() # Trimming to ensure clean output
-        $version = $version -replace 'Version: ', '' # Extracting just the version number
-        echo "version=$version" >> $Env:GITHUB_OUTPUT
+        $versionOutput = dotnet msbuild -target:PrintVersion | Out-String
+        $version = $versionOutput | Select-String -Pattern "Version: (.*)" | ForEach-Object {$_.Matches.Groups[1].Value}
+        $version = $version.Trim()
+        echo "version=$version" | Out-File -FilePath $Env:GITHUB_ENV -Append
+        echo "::set-output name=version::$version"
       working-directory: ./RDSService
+
 
     - name: Create service Release
       id: create_release
