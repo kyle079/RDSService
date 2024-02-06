@@ -21,16 +21,16 @@ namespace RDSServiceClient
         }
 
         public Task<string> GetActiveManagementServer(string? connectionBroker = null) =>
-            ProcessRequest<string>(_options.Value.ActiveManagementServerUrl);
+            ProcessRequest<string>("GetActiveManagementServer");
 
         public Task<List<RdsSession>> GetSessions(string? connectionBroker = null) =>
-            ProcessRequest<List<RdsSession>>(_options.Value.SessionsUrl);
+            ProcessRequest<List<RdsSession>>("GetSessions");
 
         public Task<bool> DisconnectSession(SessionInfo sessionInfo, string? connectionBroker = null) =>
-            ProcessPostRequest(_options.Value.DisconnectUrl, sessionInfo);
+            ProcessPostRequest("DisconnectSession", sessionInfo);
 
         public Task<bool> LogOffSession(SessionInfo sessionInfo, string? connectionBroker = null) =>
-            ProcessPostRequest(_options.Value.LogoffUrl, sessionInfo);
+            ProcessPostRequest("LogOffSession", sessionInfo);
 
         private async Task<T> ProcessRequest<T>(string url)
         {
