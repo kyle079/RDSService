@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using Microsoft.Extensions.Options;
+﻿using System.Net.Http.Json;
 using RDSServiceLibrary;
 using RDSServiceLibrary.Interfaces;
 using RDSServiceLibrary.Models;
@@ -10,14 +8,10 @@ namespace RDSServiceClient
     public class RdsSessionService : IRdsSessionService
     {
         private readonly HttpClient _httpClient;
-        private readonly IOptions<RdsServiceClientOptions> _options;
 
-        public RdsSessionService(IHttpClientFactory httpClientFactory, IOptions<RdsServiceClientOptions> options)
+        public RdsSessionService(IHttpClientFactory httpClientFactory)
         {
-            _options = options;
-            _httpClient = httpClientFactory.CreateClient("RdsServiceClient");
-            _httpClient.BaseAddress = new Uri(options.Value.BaseUrl);
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         public Task<string> GetActiveManagementServer(string? connectionBroker = null) =>
