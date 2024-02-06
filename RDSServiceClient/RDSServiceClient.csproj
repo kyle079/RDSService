@@ -9,9 +9,9 @@
         <Description>Client for RDSService running on a remote RDS connection broker</Description>
         <PackageProjectUrl>https://github.com/kyle079/RDSService</PackageProjectUrl>
         <RepositoryUrl>https://github.com/kyle079/RDSService</RepositoryUrl>
-        <Version>1.0.2</Version>
-        <AssemblyVersion>1.0.2</AssemblyVersion>
-        <FileVersion>1.0.2</FileVersion>
+        <Version>1.0.3</Version>
+        <AssemblyVersion>1.0.3</AssemblyVersion>
+        <FileVersion>1.0.3</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
