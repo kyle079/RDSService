@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Json;
-using Microsoft.Extensions.Options;
 using RDSServiceLibrary;
 using RDSServiceLibrary.Interfaces;
 using RDSServiceLibrary.Models;
+using System.Text.Json;
 
 namespace RDSServiceClient
 {
@@ -16,16 +16,16 @@ namespace RDSServiceClient
         }
 
         public Task<string> GetActiveManagementServer(string? connectionBroker = null) =>
-            ProcessRequest<string>("GetActiveManagementServer");
+            ProcessRequest<string>("RDS/GetActiveManagementServer");
 
         public Task<List<RdsSession>> GetSessions(string? connectionBroker = null) =>
-            ProcessRequest<List<RdsSession>>("GetSessions");
+            ProcessRequest<List<RdsSession>>("RDS/GetSessions");
 
         public Task<bool> DisconnectSession(SessionInfo sessionInfo, string? connectionBroker = null) =>
-            ProcessPostRequest("DisconnectSession", sessionInfo);
+            ProcessPostRequest("RDS/DisconnectSession", sessionInfo);
 
         public Task<bool> LogOffSession(SessionInfo sessionInfo, string? connectionBroker = null) =>
-            ProcessPostRequest("LogOffSession", sessionInfo);
+            ProcessPostRequest("RDS/LogOffSession", sessionInfo);
 
         private async Task<T> ProcessRequest<T>(string url)
         {
@@ -46,9 +46,12 @@ namespace RDSServiceClient
         {
             if (!response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<RdsServiceException>();
+                var content = await response.Content.ReadAsStringAsync();
+                if (!content.TrimStart().StartsWith("{"))
+                    throw new RdsServiceException($"An error occurred calling the RDS service, {response.StatusCode}, {response.Content.ReadAsStringAsync()}");
+                var result = JsonSerializer.Deserialize<RdsServiceException>(content);
                 if (result != null) throw result;
-                throw new RdsServiceException("An error occurred calling the RDS service");
+                throw new RdsServiceException($"An error occurred calling the RDS service, {response.StatusCode}, {response.Content.ReadAsStringAsync()}");
             }
         }
     }

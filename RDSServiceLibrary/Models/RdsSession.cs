@@ -5,6 +5,8 @@ namespace RDSServiceLibrary.Models;
 
 public class RdsSession
 {
+    public RdsSession() { }
+    
     public RdsSession(PSObject psObject)
     {
         CollectionName = psObject.Properties["CollectionName"].Value.ToString() ?? string.Empty;

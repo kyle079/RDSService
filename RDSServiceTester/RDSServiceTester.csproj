@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\RDSServiceClient\RDSServiceClient.csproj" />
       <ProjectReference Include="..\RDSService\RDSService.csproj" />
     </ItemGroup>
 
