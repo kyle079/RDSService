@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using Microsoft.Extensions.Options;
 using RDSServiceLibrary;
 using RDSServiceLibrary.Interfaces;
 using RDSServiceLibrary.Models;
@@ -9,9 +10,10 @@ namespace RDSServiceClient
     {
         private readonly HttpClient _httpClient;
 
-        public RdsSessionService(IHttpClientFactory httpClientFactory)
+        public RdsSessionService(IHttpClientFactory httpClientFactory, IOptions<RdsServiceClientOptions> options)
         {
             _httpClient = httpClientFactory.CreateClient();
+            _httpClient.BaseAddress = new Uri(options.Value.BaseUrl);
         }
 
         public Task<string> GetActiveManagementServer(string? connectionBroker = null) =>

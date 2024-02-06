@@ -12,6 +12,7 @@
         <Version>1.0.3</Version>
         <AssemblyVersion>1.0.3</AssemblyVersion>
         <FileVersion>1.0.3</FileVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
