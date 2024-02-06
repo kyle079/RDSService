@@ -10,10 +10,9 @@ namespace RDSServiceClient
     {
         private readonly HttpClient _httpClient;
 
-        public RdsSessionService(IHttpClientFactory httpClientFactory, IOptions<RdsServiceClientOptions> options)
+        public RdsSessionService(HttpClient httpClient)
         {
-            _httpClient = httpClientFactory.CreateClient();
-            _httpClient.BaseAddress = new Uri(options.Value.BaseUrl);
+            _httpClient = httpClient;
         }
 
         public Task<string> GetActiveManagementServer(string? connectionBroker = null) =>
